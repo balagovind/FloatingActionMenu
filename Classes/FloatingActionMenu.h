@@ -1,6 +1,5 @@
 //
 //  FloatingActionMenu.h
-//  ControlSystem
 //
 //  Created by KeithEllis on 14/12/10.
 //  Copyright (c) 2014 keith. All rights reserved.

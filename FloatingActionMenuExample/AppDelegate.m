@@ -19,7 +19,7 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
     self.window.rootViewController = [[ViewController alloc] init];
-    self.window.backgroundColor = [UIColor colorWithRed:0.48 green:0.67 blue:0.97 alpha:1];
+    self.window.backgroundColor = [UIColor colorWithRed:0.98 green:0.98 blue:0.98 alpha:1];
     [self.window makeKeyAndVisible];
     return YES;
 }

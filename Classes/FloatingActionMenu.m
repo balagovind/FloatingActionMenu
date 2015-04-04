@@ -1,6 +1,5 @@
 //
 //  FloatingActionMenu.m
-//  ControlSystem
 //
 //  Created by KeithEllis on 14/12/10.
 //  Copyright (c) 2014 keith. All rights reserved.
@@ -18,6 +17,8 @@
 // Degrees to radians
 #define DEGREES_TO_RADIANS(angle) ((angle) / 180.0 * M_PI)
 #define RADIANS_TO_DEGREES(radians) ((radians) * (180.0 / M_PI))
+
+#define Animate_Duration 0.2
 
 @interface FloatingActionMenu ()
 
@@ -189,7 +190,7 @@
 
 - (void)orientationChanged:(NSNotification*)notification
 {
-    NSLog(@"Orientation has changed: %d", [[notification object] orientation]);
+    NSLog(@"Orientation has changed: %zd", [[notification object] orientation]);
 #pragma mark - TODO Change FloatingActionMenu view animated according to orientation change
 }
 
@@ -337,7 +338,7 @@ static CGFloat SubmenuButtonSize = 40.f;
     switch (state) {
     case ExpandedState: {
         CABasicAnimation* rotation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-        rotation.duration = 0.2;
+        rotation.duration = Animate_Duration;
         rotation.delegate = self;
         rotation.removedOnCompletion = NO;
         rotation.fillMode = kCAFillModeRemoved;
@@ -345,13 +346,21 @@ static CGFloat SubmenuButtonSize = 40.f;
         rotation.toValue = [NSNumber numberWithFloat:DEGREES_TO_RADIANS(0 + 90)];
         [rotation setValue:@"expandImage" forKey:@"expandMenu"];
 
+        CABasicAnimation *fadeContent = [CABasicAnimation animationWithKeyPath:@"contents"];
+        fadeContent.duration = Animate_Duration;
+        fadeContent.fromValue = (id)self.image.CGImage;
+        fadeContent.toValue = (id)self.expandedImage.CGImage;
+        fadeContent.removedOnCompletion = NO;
+        fadeContent.fillMode = kCAFillModeForwards;
+        
         [self.actionButton.imageView.layer addAnimation:rotation forKey:@"rotation"];
+        [self.actionButton.imageView.layer addAnimation:fadeContent forKey:@"animateContents"];
 
         [self addShowLabelButtonAnimation];
     } break;
     case FoldingState: {
         CABasicAnimation* rotation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-        rotation.duration = 0.2;
+        rotation.duration = Animate_Duration;
         rotation.delegate = self;
         rotation.removedOnCompletion = NO;
         rotation.fillMode = kCAFillModeRemoved;
@@ -359,7 +368,15 @@ static CGFloat SubmenuButtonSize = 40.f;
         rotation.toValue = [NSNumber numberWithFloat:DEGREES_TO_RADIANS(0 - 90)];
         [rotation setValue:@"foldImage" forKey:@"foldMenu"];
 
+        CABasicAnimation *fadeContent = [CABasicAnimation animationWithKeyPath:@"contents"];
+        fadeContent.duration = Animate_Duration;
+        fadeContent.fromValue = (id)self.expandedImage.CGImage;
+        fadeContent.toValue = (id)self.image.CGImage;
+        fadeContent.removedOnCompletion = NO;
+        fadeContent.fillMode = kCAFillModeForwards;
+        
         [self.actionButton.imageView.layer addAnimation:rotation forKey:@"rotation"];
+        [self.actionButton.imageView.layer addAnimation:fadeContent forKey:@"animateContents"];
 
         [self addHideLabelButtonAnimation];
 
@@ -377,7 +394,7 @@ static CGFloat SubmenuButtonSize = 40.f;
         [self addShowLabelButtonAnimation];
 
         CABasicAnimation* scale = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
-        scale.duration = 0.2f;
+        scale.duration = Animate_Duration;
         scale.delegate = self;
         scale.removedOnCompletion = NO;
         scale.fillMode = kCAFillModeForwards;
@@ -386,7 +403,7 @@ static CGFloat SubmenuButtonSize = 40.f;
         [scale setValue:@"show" forKey:@"showActionButton"];
 
         CABasicAnimation* opacity = [CABasicAnimation animationWithKeyPath:@"opacity"];
-        opacity.duration = 0.2;
+        opacity.duration = Animate_Duration;
         opacity.removedOnCompletion = NO;
         opacity.fillMode = kCAFillModeForwards;
         opacity.fromValue = [NSNumber numberWithFloat:0.f];
@@ -400,7 +417,7 @@ static CGFloat SubmenuButtonSize = 40.f;
         [self addHideLabelButtonAnimation];
 
         CABasicAnimation* scale = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
-        scale.duration = 0.2f;
+        scale.duration = Animate_Duration;
         scale.delegate = self;
         scale.removedOnCompletion = NO;
         scale.fillMode = kCAFillModeForwards;
@@ -409,7 +426,7 @@ static CGFloat SubmenuButtonSize = 40.f;
         [scale setValue:@"hide" forKey:@"hideActionButton"];
 
         CABasicAnimation* opacity = [CABasicAnimation animationWithKeyPath:@"opacity"];
-        opacity.duration = 0.2;
+        opacity.duration = Animate_Duration;
         opacity.removedOnCompletion = NO;
         opacity.fillMode = kCAFillModeForwards;
         opacity.fromValue = [NSNumber numberWithFloat:1.f];
@@ -430,7 +447,7 @@ static CGFloat SubmenuButtonSize = 40.f;
     self.labelButton.hidden = NO;
 
     CABasicAnimation* opacity = [CABasicAnimation animationWithKeyPath:@"opacity"];
-    opacity.duration = 0.2;
+    opacity.duration = Animate_Duration;
     opacity.delegate = self;
     opacity.removedOnCompletion = NO;
     opacity.fillMode = kCAFillModeForwards;
@@ -444,7 +461,7 @@ static CGFloat SubmenuButtonSize = 40.f;
 - (void)addHideLabelButtonAnimation
 {
     CABasicAnimation* opacity = [CABasicAnimation animationWithKeyPath:@"opacity"];
-    opacity.duration = 0.2;
+    opacity.duration = Animate_Duration;
     opacity.delegate = self;
     opacity.removedOnCompletion = NO;
     opacity.fillMode = kCAFillModeForwards;
@@ -457,16 +474,6 @@ static CGFloat SubmenuButtonSize = 40.f;
 
 - (void)animationDidStop:(CAAnimation*)theAnimation finished:(BOOL)flag
 {
-    if ([[theAnimation valueForKey:@"expandMenu"] isEqualToString:@"expandImage"]) {
-        [self.actionButton setImage:self.expandedImage forState:UIControlStateNormal];
-        [self.actionButton setImage:self.expandedImage forState:UIControlStateHighlighted];
-        [self.actionButton setImage:self.expandedImage forState:UIControlStateSelected];
-    }
-    if ([[theAnimation valueForKey:@"foldMenu"] isEqualToString:@"foldImage"]) {
-        [self.actionButton setImage:self.image forState:UIControlStateNormal];
-        [self.actionButton setImage:self.image forState:UIControlStateHighlighted];
-        [self.actionButton setImage:self.image forState:UIControlStateSelected];
-    }
     if ([[theAnimation valueForKey:@"hideLabelButton"] isEqualToString:@"hide"]) {
         self.labelButton.alpha = 0.f;
         self.labelButton.hidden = YES;
@@ -602,9 +609,9 @@ static CGFloat SubmenuButtonSize = 40.f;
         self.backgroundColor = self.highlightedColor;
     }
     else {
-        [UIView animateWithDuration:0.3
+        [UIView animateWithDuration:Animate_Duration
                          animations:^{
-            self.backgroundColor = self.color;
+                             self.backgroundColor = self.color;
                          }];
     }
 }
