@@ -25,7 +25,7 @@
 @property (nonatomic, strong) UIViewController* viewController;
 @property (nonatomic, strong) UIImage* image;
 @property (nonatomic, strong) UIImage* expandedImage;
-@property (nonatomic, strong) NSString* titleText;
+@property (nonatomic, copy) NSString* titleText;
 @property (nonatomic, strong) UIColor* color;
 @property (nonatomic, strong) NSArray* expandedItems;
 
@@ -259,7 +259,7 @@ typedef enum {
 
 @property (nonatomic, strong) UIImage* image;
 @property (nonatomic, strong) UIImage* expandedImage;
-@property (nonatomic, strong) NSString* titleText;
+@property (nonatomic, copy) NSString* titleText;
 @property (nonatomic, strong) UIColor* color;
 @property (nonatomic, strong) UILabel* titleLabel;
 @property (nonatomic, strong) UIImageView* imageView;
